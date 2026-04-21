@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人情往来记录仪</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #2c3e50;
+    --ink-light: #5d7083;
+    --ink-faint: #9fb3c8;
+    --paper: #f5f0e8;
+    --paper-warm: #ede8dc;
+    --paper-card: #faf7f2;
+    --red-seal: #c0392b;
+    --red-seal-light: #e74c3c;
+    --gold: #b8860b;
+    --gold-light: #d4a017;
+    --teal: #2d6a6a;
+    --teal-light: #3d8c8c;
+    --teal-pale: #d0e8e8;
+    --border: #d9d0bf;
+    --shadow: rgba(44,62,80,0.08);
+    --shadow-md: rgba(44,62,80,0.14);
+    --give: #c0392b;
+    --give-bg: #fdf0ee;
+    --receive: #2d6a6a;
+    --receive-bg: #edf5f5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 0% 0%, rgba(184,134,11,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 100% 100%, rgba(45,106,106,0.07) 0%, transparent 50%);
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #1a2f3f 0%, #2c3e50 60%, #2d6a6a 100%);
+    color: #f5f0e8;
+    padding: 24px 20px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    border: 2px solid rgba(184,134,11,0.25);
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    top: -10px; right: -10px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 1px solid rgba(184,134,11,0.15);
+  }
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .seal {
+    width: 48px; height: 48px;
+    border: 2px solid var(--gold-light);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 10px;
+    color: var(--gold-light);
+    writing-mode: vertical-rl;
+    letter-spacing: 2px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+  h1 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    line-height: 1.3;
+  }
+  h1 small {
+    display: block;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: rgba(245,240,232,0.6);
+    margin-top: 2px;
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+  .privacy-badge {
+    background: rgba(45,106,106,0.35);
+    border: 1px solid rgba(45,106,106,0.6);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 10px;
+    color: rgba(245,240,232,0.85);
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .privacy-badge::before { content: '🔒'; font-size: 10px; }
+
+  /* SEARCH */
+  .search-section {
+    padding: 16px 20px;
+    background: var(--paper-warm);
+    border-bottom: 1px solid var(--border);
+  }
+  .search-wrap {
+    position: relative;
+  }
+  .search-wrap svg {
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    width: 16px; height: 16px;
+    color: var(--ink-faint);
+    pointer-events: none;
+  }
+  #searchInput {
+    width: 100%;
+    padding: 10px 12px 10px 38px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--paper-card);
+    font-size: 14px;
+    font-family: 'Noto Sans SC', sans-serif;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  #searchInput:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(45,106,106,0.12);
+  }
+  #searchInput::placeholder { color: var(--ink-faint); }
+
+  /* SUMMARY CARD */
+  #summaryCard {
+    margin: 12px 20px;
+    background: linear-gradient(135deg, var(--ink) 0%, #2d6a6a 100%);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: #f5f0e8;
+    display: none;
+    animation: slideDown 0.25s ease;
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  #summaryCard .person-name {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(245,240,232,0.2);
+    padding-bottom: 8px;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .summary-item {
+    text-align: center;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 10px 6px;
+  }
+  .summary-item .label {
+    font-size: 10px;
+    color: rgba(245,240,232,0.65);
+    margin-bottom: 4px;
+  }
+  .summary-item .amount {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .summary-item.give .amount { color: #f0a0a0; }
+  .summary-item.receive .amount { color: #80d0c0; }
+  .summary-item.balance .amount { font-size: 14px; }
+  .balance-note {
+    margin-top: 10px;
+    font-size: 11px;
+    color: rgba(245,240,232,0.7);
+    text-align: center;
+  }
+
+  /* MAIN */
+  main { padding: 0 0 80px; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    background: var(--paper-warm);
+    border-bottom: 2px solid var(--border);
+    padding: 0 20px;
+    gap: 0;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border: none;
+    background: transparent;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-faint);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+    letter-spacing: 1px;
+  }
+  .tab-btn.active {
+    color: var(--ink);
+  }
+  .tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 2px;
+    background: var(--teal);
+    border-radius: 2px 2px 0 0;
+  }
+  .tab-btn .tab-count {
+    display: inline-block;
+    margin-left: 5px;
+    background: var(--teal-pale);
+    color: var(--teal);
+    border-radius: 10px;
+    font-size: 10px;
+    padding: 1px 6px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-weight: 500;
+  }
+  .tab-btn.active .tab-count {
+    background: var(--teal);
+    color: white;
+  }
+
+  /* PANEL */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ADD FORM */
+  .add-section {
+    margin: 16px 20px;
+    background: var(--paper-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .add-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .add-section-header h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toggle-icon {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    color: var(--ink-light);
+    transition: transform 0.2s;
+  }
+  .add-section.open .toggle-icon { transform: rotate(45deg); }
+  .form-body {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .add-section.open .form-body { display: block; }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .form-group.full { grid-column: 1 / -1; }
+  label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink-light);
+    letter-spacing: 0.5px;
+  }
+  input, select {
+    padding: 9px 11px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    font-size: 14px;
+    font-family: 'Noto Sans SC', sans-serif;
+    color: var(--ink);
+    background: white;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input:focus, select:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(45,106,106,0.1);
+  }
+  .btn-add {
+    margin-top: 14px;
+    width: 100%;
+    padding: 11px;
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn-add:active { transform: scale(0.98); opacity: 0.9; }
+
+  /* RECORDS */
+  .records-section { padding: 0 20px; }
+  .records-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .records-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-light);
+    letter-spacing: 1px;
+  }
+  .total-badge {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+  .total-badge.give {
+    background: var(--give-bg);
+    color: var(--give);
+  }
+  .total-badge.receive {
+    background: var(--receive-bg);
+    color: var(--receive);
+  }
+
+  .record-card {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 15px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    transition: box-shadow 0.2s;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .record-card:hover { box-shadow: 0 2px 12px var(--shadow-md); }
+  .record-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .give .record-dot { background: var(--give); }
+  .receive .record-dot { background: var(--receive); }
+  .record-info { flex: 1; min-width: 0; }
+  .record-name {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .record-meta {
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .record-event {
+    background: var(--paper-warm);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--ink-light);
+    font-weight: 500;
+  }
+  .record-amount {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 17px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .give .record-amount { color: var(--give); }
+  .receive .record-amount { color: var(--receive); }
+  .record-amount::before { content: '¥'; font-size: 11px; }
+  .btn-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-faint);
+    font-size: 16px;
+    padding: 4px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+  .btn-del:hover { color: var(--red-seal); }
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-faint);
+  }
+  .empty-state .icon { font-size: 36px; margin-bottom: 10px; }
+  .empty-state p { font-size: 13px; line-height: 1.6; }
+
+  /* FOOTER TOOLS */
+  .footer-tools {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--paper-warm);
+    border-top: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    gap: 10px;
+  }
+  .btn-tool {
+    flex: 1;
+    padding: 10px 8px;
+    border-radius: 8px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1.5px solid;
+    transition: opacity 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  .btn-tool:active { transform: scale(0.97); }
+  .btn-export {
+    background: transparent;
+    color: var(--teal);
+    border-color: var(--teal);
+  }
+  .btn-clear {
+    background: transparent;
+    color: var(--red-seal);
+    border-color: var(--red-seal);
+  }
+
+  /* PRIVACY NOTICE */
+  .privacy-notice {
+    margin: 8px 20px 0;
+    padding: 8px 12px;
+    background: rgba(45,106,106,0.07);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 6px 6px 0;
+    font-size: 11px;
+    color: var(--ink-light);
+    line-height: 1.5;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: var(--ink);
+    color: #f5f0e8;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 9999;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* CONFIRM MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: flex-end;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: var(--paper-card);
+    border-radius: 16px 16px 0 0;
+    padding: 24px 20px 32px;
+    width: 100%;
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+  }
+  .modal-overlay.show .modal-box { transform: translateY(0); }
+  .modal-box h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .modal-box p {
+    font-size: 13px;
+    color: var(--ink-light);
+    margin-bottom: 20px;
+  }
+  .modal-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .btn-cancel {
+    padding: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 14px;
+    color: var(--ink-light);
+    cursor: pointer;
+  }
+  .btn-confirm-del {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: var(--red-seal);
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 14px;
+    color: white;
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  @media (max-width: 360px) {
+    h1 { font-size: 18px; }
+    .summary-item .amount { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="header-title">
+      <div class="seal">人情<br>账册</div>
+      <div>
+        <h1>人情往来记录仪<small>Gift Record · 随份子账本</small></h1>
+      </div>
+    </div>
+    <div class="privacy-badge">纯离线</div>
+  </div>
+</header>
+
+<div class="search-section">
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" id="searchInput" placeholder="搜索姓名 · 查看人情差额…" oninput="handleSearch()">
+  </div>
+</div>
+
+<div id="summaryCard">
+  <div class="person-name" id="summaryName"></div>
+  <div class="summary-grid">
+    <div class="summary-item give">
+      <div class="label">我随出</div>
+      <div class="amount" id="summaryGive">¥0</div>
+    </div>
+    <div class="summary-item receive">
+      <div class="label">对方随入</div>
+      <div class="amount" id="summaryReceive">¥0</div>
+    </div>
+    <div class="summary-item balance">
+      <div class="label">人情差额</div>
+      <div class="amount" id="summaryBalance"></div>
+    </div>
+  </div>
+  <div class="balance-note" id="summaryNote"></div>
+</div>
+
+<div class="privacy-notice">
+  🔒 本工具为纯离线版本，数据仅保存在您的浏览器本地缓存中，不会上传至任何服务器，请放心使用。
+</div>
+
+<main>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('give')" id="tabGive">
+      我随出 <span class="tab-count" id="countGive">0</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('receive')" id="tabReceive">
+      对方随入 <span class="tab-count" id="countReceive">0</span>
+    </button>
+  </div>
+
+  <!-- 随出面板 -->
+  <div class="panel active give" id="panelGive">
+    <div class="add-section" id="addSectionGive">
+      <div class="add-section-header" onclick="toggleForm('give')">
+        <h3>＋ 新增随出记录</h3>
+        <div class="toggle-icon">＋</div>
+      </div>
+      <div class="form-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>姓名 *</label>
+            <input type="text" id="giveName" placeholder="如：张三">
+          </div>
+          <div class="form-group">
+            <label>金额（元）*</label>
+            <input type="number" id="giveAmount" placeholder="如：200" min="0">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>事件类型</label>
+            <select id="giveEvent">
+              <option value="结婚">结婚</option>
+              <option value="生娃">生娃</option>
+              <option value="乔迁">乔迁</option>
+              <option value="满月">满月</option>
+              <option value="百日">百日</option>
+              <option value="生日">生日</option>
+              <option value="升学">升学</option>
+              <option value="丧事">丧事</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>日期</label>
+            <input type="date" id="giveDate">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group full">
+            <label>备注（可选）</label>
+            <input type="text" id="giveNote" placeholder="如：婚礼在万豪酒店">
+          </div>
+        </div>
+        <button class="btn-add" onclick="addRecord('give')">记 录 随 出</button>
+      </div>
+    </div>
+    <div class="records-section" id="listGive"></div>
+  </div>
+
+  <!-- 随入面板 -->
+  <div class="panel receive" id="panelReceive">
+    <div class="add-section" id="addSectionReceive">
+      <div class="add-section-header" onclick="toggleForm('receive')">
+        <h3>＋ 新增随入记录</h3>
+        <div class="toggle-icon">＋</div>
+      </div>
+      <div class="form-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>姓名 *</label>
+            <input type="text" id="receiveName" placeholder="如：李四">
+          </div>
+          <div class="form-group">
+            <label>金额（元）*</label>
+            <input type="number" id="receiveAmount" placeholder="如：300" min="0">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>事件类型</label>
+            <select id="receiveEvent">
+              <option value="结婚">结婚</option>
+              <option value="生娃">生娃</option>
+              <option value="乔迁">乔迁</option>
+              <option value="满月">满月</option>
+              <option value="百日">百日</option>
+              <option value="生日">生日</option>
+              <option value="升学">升学</option>
+              <option value="丧事">丧事</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>日期</label>
+            <input type="date" id="receiveDate">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group full">
+            <label>备注（可选）</label>
+            <input type="text" id="receiveNote" placeholder="如：我的婚礼">
+          </div>
+        </div>
+        <button class="btn-add" onclick="addRecord('receive')">记 录 随 入</button>
+      </div>
+    </div>
+    <div class="records-section" id="listReceive"></div>
+  </div>
+</main>
+
+<div class="footer-tools">
+  <button class="btn-tool btn-export" onclick="exportData()">
+    <span>📥</span> 导出备份
+  </button>
+  <button class="btn-tool btn-clear" onclick="confirmClear()">
+    <span>🗑</span> 清空记录
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-box">
+    <h3>⚠️ 确认清空所有数据？</h3>
+    <p>此操作将永久删除全部随出和随入记录，无法撤销。建议先导出备份。</p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn-confirm-del" onclick="clearAll()">确认清空</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── DATA ──────────────────────────────────────────────────
+  let data = { give: [], receive: [] };
+  let currentTab = 'give';
+  let searchQuery = '';
+
+  function loadData() {
+    try {
+      const saved = localStorage.getItem('renqing_data');
+      if (saved) data = JSON.parse(saved);
+    } catch(e) {}
+  }
+
+  function saveData() {
+    localStorage.setItem('renqing_data', JSON.stringify(data));
+  }
+
+  // ── INIT ──────────────────────────────────────────────────
+  loadData();
+  document.getElementById('giveDate').value = today();
+  document.getElementById('receiveDate').value = today();
+  render();
+
+  function today() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  // ── TABS ──────────────────────────────────────────────────
+  function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab' + cap(tab)).classList.add('active');
+    document.getElementById('panel' + cap(tab)).classList.add('active');
+  }
+
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // ── FORM TOGGLE ───────────────────────────────────────────
+  function toggleForm(type) {
+    const sec = document.getElementById('addSection' + cap(type));
+    sec.classList.toggle('open');
+  }
+
+  // ── ADD RECORD ────────────────────────────────────────────
+  function addRecord(type) {
+    const name = document.getElementById(type + 'Name').value.trim();
+    const amount = parseFloat(document.getElementById(type + 'Amount').value);
+    const event = document.getElementById(type + 'Event').value;
+    const date = document.getElementById(type + 'Date').value;
+    const note = document.getElementById(type + 'Note').value.trim();
+
+    if (!name) { toast('请填写姓名'); return; }
+    if (!amount || amount <= 0) { toast('请输入有效金额'); return; }
+
+    const record = {
+      id: Date.now(),
+      name, amount, event,
+      date: date || today(),
+      note
+    };
+
+    data[type].unshift(record);
+    saveData();
+
+    // reset
+    document.getElementById(type + 'Name').value = '';
+    document.getElementById(type + 'Amount').value = '';
+    document.getElementById(type + 'Note').value = '';
+    document.getElementById(type + 'Date').value = today();
+    document.getElementById('addSection' + cap(type)).classList.remove('open');
+
+    render();
+    handleSearch();
+    toast('✓ 记录已保存');
+  }
+
+  // ── DELETE ────────────────────────────────────────────────
+  function deleteRecord(type, id) {
+    data[type] = data[type].filter(r => r.id !== id);
+    saveData();
+    render();
+    handleSearch();
+    toast('已删除');
+  }
+
+  // ── RENDER ────────────────────────────────────────────────
+  function render() {
+    renderList('give');
+    renderList('receive');
+    updateCounts();
+  }
+
+  function filterRecords(type) {
+    if (!searchQuery) return data[type];
+    return data[type].filter(r => r.name.includes(searchQuery));
+  }
+
+  function renderList(type) {
+    const list = document.getElementById('list' + cap(type));
+    const records = filterRecords(type);
+    const total = records.reduce((s, r) => s + r.amount, 0);
+
+    if (records.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">${type === 'give' ? '🧧' : '🎁'}</div>
+          <p>${searchQuery ? `没有"${searchQuery}"的相关记录` : '暂无记录，点击上方添加第一条'}</p>
+        </div>`;
+      return;
+    }
+
+    const totalBadge = `<span class="total-badge ${type}">共 ¥${total.toLocaleString()}</span>`;
+    const header = `
+      <div class="records-header">
+        <span class="records-title">${type === 'give' ? '随出明细' : '随入明细'} · ${records.length}条</span>
+        ${totalBadge}
+      </div>`;
+
+    const cards = records.map(r => `
+      <div class="record-card ${type}" data-id="${r.id}">
+        <div class="record-dot"></div>
+        <div class="record-info">
+          <div class="record-name">${esc(r.name)}</div>
+          <div class="record-meta">
+            <span class="record-event">${esc(r.event)}</span>
+            <span>${r.date}</span>
+            ${r.note ? `<span>· ${esc(r.note)}</span>` : ''}
+          </div>
+        </div>
+        <div class="record-amount">${r.amount.toLocaleString()}</div>
+        <button class="btn-del" onclick="deleteRecord('${type}', ${r.id})" title="删除">×</button>
+      </div>`).join('');
+
+    list.innerHTML = header + cards;
+  }
+
+  function updateCounts() {
+    document.getElementById('countGive').textContent = data.give.length;
+    document.getElementById('countReceive').textContent = data.receive.length;
+  }
+
+  // ── SEARCH & SUMMARY ─────────────────────────────────────
+  function handleSearch() {
+    searchQuery = document.getElementById('searchInput').value.trim();
+    render();
+
+    const card = document.getElementById('summaryCard');
+    if (!searchQuery) {
+      card.style.display = 'none';
+      return;
+    }
+
+    const giveTotal = data.give.filter(r => r.name.includes(searchQuery)).reduce((s, r) => s + r.amount, 0);
+    const receiveTotal = data.receive.filter(r => r.name.includes(searchQuery)).reduce((s, r) => s + r.amount, 0);
+    const balance = giveTotal - receiveTotal;
+
+    document.getElementById('summaryName').textContent = `"${searchQuery}" 的人情账`
+    document.getElementById('summaryGive').textContent = `¥${giveTotal.toLocaleString()}`;
+    document.getElementById('summaryReceive').textContent = `¥${receiveTotal.toLocaleString()}`;
+
+    let balanceText, noteText;
+    if (balance > 0) {
+      balanceText = `↑ ¥${balance.toLocaleString()}`;
+      noteText = `我方净随出 ¥${balance.toLocaleString()}，对方尚未还情`;
+      document.getElementById('summaryBalance').style.color = '#f0a0a0';
+    } else if (balance < 0) {
+      balanceText = `↓ ¥${Math.abs(balance).toLocaleString()}`;
+      noteText = `对方净随入 ¥${Math.abs(balance).toLocaleString()}，我方尚欠情`;
+      document.getElementById('summaryBalance').style.color = '#80d0c0';
+    } else {
+      balanceText = '持平 ✓';
+      noteText = '双方人情两清，互不相欠';
+      document.getElementById('summaryBalance').style.color = 'rgba(245,240,232,0.85)';
+    }
+
+    document.getElementById('summaryBalance').textContent = balanceText;
+    document.getElementById('summaryNote').textContent = noteText;
+    card.style.display = 'block';
+  }
+
+  // ── EXPORT ────────────────────────────────────────────────
+  function exportData() {
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `人情往来备份_${today()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('✓ 数据已导出');
+  }
+
+  // ── CLEAR ─────────────────────────────────────────────────
+  function confirmClear() {
+    document.getElementById('modalOverlay').classList.add('show');
+  }
+  function closeModal(e) {
+    if (!e || e.target === document.getElementById('modalOverlay')) {
+      document.getElementById('modalOverlay').classList.remove('show');
+    }
+  }
+  function clearAll() {
+    data = { give: [], receive: [] };
+    saveData();
+    render();
+    closeModal();
+    document.getElementById('summaryCard').style.display = 'none';
+    document.getElementById('searchInput').value = '';
+    searchQuery = '';
+    toast('✓ 已清空所有记录');
+  }
+
+  // ── TOAST ─────────────────────────────────────────────────
+  let toastTimer;
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+  }
+
+  // ── UTILS ─────────────────────────────────────────────────
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+</script>
+</body>
+</html>
